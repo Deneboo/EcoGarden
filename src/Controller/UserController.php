@@ -51,7 +51,7 @@ final class UserController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/user/update/{id}', name: 'app_user_update', requirements: ['id' => '\d+'], methods: ['PUT'])]
+    #[Route('/api/user/{id}/update', name: 'app_user_update', requirements: ['id' => '\d+'], methods: ['PUT'])]
     public function updateUser(Request $request, SerializerInterface $serializer, User $user, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $serializer->deserialize($request->getContent(), User::class, 'json', ['object_to_populate' => $user]);
@@ -66,7 +66,7 @@ final class UserController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/user/delete/{id}', name: 'app_user_delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    #[Route('/api/user/{id}/delete', name: 'app_user_delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
     public function deleteUser(int $id, EntityManagerInterface $em): JsonResponse
     {
         $user = $em->getRepository(User::class)->find($id);
@@ -75,6 +75,6 @@ final class UserController extends AbstractController
         }
         $em->remove($user);
         $em->flush();
-        return new JsonResponse("L'utilisateur a été supprimé avec succès.", Response::HTTP_OK);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }
