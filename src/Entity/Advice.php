@@ -18,7 +18,7 @@ class Advice
     private ?string $description = null;
 
     #[ORM\Column(length: 2)]
-    private ?string $month = null;
+    private array $months = [];
 
     public function getId(): ?int
     {
@@ -37,14 +37,19 @@ class Advice
         return $this;
     }
 
-    public function getMonth(): ?string
+    public function getMonths(): array
     {
-        return $this->month;
+        $months = $this->months;
+
+        return array_unique($months);
     }
 
-    public function setMonth(string $month): static
+    /**
+     * @param list<string> $months
+     */
+    public function setMonths(array $months): static
     {
-        $this->month = $month;
+        $this->months = $months;
 
         return $this;
     }

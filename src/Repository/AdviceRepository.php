@@ -19,17 +19,16 @@ class AdviceRepository extends ServiceEntityRepository
    /**
     * @return Advice[] Returns an array of Advice objects
     */
-   public function findByMonth(string $month): array
-   {
-       return $this->createQueryBuilder('a')
-           ->andWhere('a.month = :month')
-           ->setParameter('month', $month)
-           ->orderBy('a.id', 'ASC')
-           ->setMaxResults(10)
-           ->getQuery()
-           ->getResult()
-       ;
-   }
+    public function findByMonth(string $month): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('JSON_CONTAINS(a.months, :month) = 1')
+            ->setParameter('month', json_encode($month))
+            ->orderBy('a.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+}
 
 //    public function findOneBySomeField($value): ?Advice
 //    {

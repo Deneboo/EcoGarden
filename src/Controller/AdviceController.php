@@ -24,7 +24,7 @@ final class AdviceController extends AbstractController
         );
     }
 
-    #[Route('/api/advice/{month}', name: 'app_advice_by_month', requirements: ['month' => '0[1-9]|1[0-2]'], methods: ['GET'])]
+    #[Route('/api/advice/{month}', name: 'app_advice_by_month', requirements: ['month' => '0?[1-9]|1[0-2]'], methods: ['GET'])]
     public function getAdviceByMonth(string$month, AdviceRepository $adviceRepository, SerializerInterface $serializer): JsonResponse
     {
         if (strlen($month) > 2 || !ctype_digit($month)) {
@@ -61,7 +61,7 @@ final class AdviceController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/advice/update/{id}', name: 'app_advice_update', requirements: ['id' => '\d+'], methods: ['PUT'])]
+    #[Route('/api/advice/{id}/update', name: 'app_advice_update', requirements: ['id' => '\d+'], methods: ['PUT'])]
     public function updateAdvice(Request $request, SerializerInterface $serializer, Advice $advice, EntityManagerInterface $em): JsonResponse
     {
         $serializer->deserialize(
@@ -70,8 +70,21 @@ final class AdviceController extends AbstractController
             'json',
             ['object_to_populate' => $advice]
         );
-        if ($advice->getMonth() < 1 || $advice->getMonth() > 12) {
-            return new JsonResponse(['error' => 'Mois invalide. le mois doit être compris entre "1" et "12".'], Response::HTTP_BAD_REQUEST);
+
+        if (empty($advice->getMonths())) {
+            return new JsonResponse(
+                ['error' => 'Vous devez renseigner au moins un mois.'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        foreach ($advice->getMonths() as $month) {
+            if ($month < 1 || $month > 12) {
+                return new JsonResponse(
+                    ['error' => 'Mois invalide. Chaque mois doit être compris entre 1 et 12.'],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
         }
         $em->persist($advice);
         $em->flush();
@@ -79,7 +92,7 @@ final class AdviceController extends AbstractController
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/api/advice/delete/{id}', name: 'app_advice_delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    #[Route('/api/advice/{id}/delete', name: 'app_advice_delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
     public function deleteAdvice(int $id, EntityManagerInterface $em): JsonResponse
     {
         $advice = $em->getRepository(Advice::class)->find($id);
@@ -89,7 +102,7 @@ final class AdviceController extends AbstractController
         $em->remove($advice);
         $em->flush();
 
-        // Return a success message for the deletion
+        // Return a success message for the deletion but we could also use a 204 No Content response if we don't want to return any content.
         return new JsonResponse("L'avis a été supprimé avec succès.", Response::HTTP_OK);   
     } 
 }
