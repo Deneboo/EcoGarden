@@ -15,7 +15,7 @@ class AppFixtures extends Fixture
         UserFactory::createMany(5);
          foreach (AdviceData::ADVICES as $data) {
             $advice = new Advice();
-            $advice->setMonth($data['month']);
+            $advice->setMonths($data['month']);
             $advice->setDescription($data['description']);
 
             $manager->persist($advice);
