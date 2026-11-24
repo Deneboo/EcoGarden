@@ -2,11 +2,12 @@
 
 namespace App\Controller;
 
+use App\DTO\Weather;
 use App\Services\GeocodingLocationService;
+use App\Services\WeatherService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Services\WeatherService;
 
 final class WeatherApiController extends AbstractController
 {
@@ -18,7 +19,6 @@ final class WeatherApiController extends AbstractController
     #[Route('/api/weather', name: 'app_weather', methods: ['GET'])]
     public function index(): ?JsonResponse
     {
-        // echo "Coucou";
         $user = $this->getUser();
         $postCode = $user->getPostCode();
 
@@ -28,6 +28,16 @@ final class WeatherApiController extends AbstractController
         $location = $this->geocodingLocation->getGpsLocation($postCode);
         $weather = $this->weatherService->getWeather($location);
 
-        return new JsonResponse($weather);
+        return $this->json([
+            'city' => $weather->getCity(),
+            'temperature' => $weather->getTemperature(),
+            'feelsLike' => $weather->getFeelsLike(),
+            'tempMin' => $weather->getTempMin(),
+            'tempMax' => $weather->getTempMax(),
+            'windSpeed' => $weather->getWindSpeed(),
+            'description' => $weather->getDescription(),
+            'humidity' => $weather->getHumidity(),
+            'icon' => $weather->getIcon(),
+        ]);
     }
 }

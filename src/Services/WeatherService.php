@@ -3,35 +3,22 @@
 namespace App\Services;
 
 use App\DTO\Location;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\DTO\Weather;
+use App\Interface\WeatherProviderInterface;
+
 
 class WeatherService
 {
     public function __construct(
-        private HttpClientInterface $client,
-        #[Autowire('%weather_api_url%')]
-        private string $apiUrl,
-        #[Autowire('%env(API_WEATHER_KEY)%')]
-        private readonly string $apiKey,
+        private readonly WeatherProviderInterface $weatherProvider,
     ) {}
 
-    public function getWeather(Location $location): ?array
+    public function getWeather(Location $location): ?Weather
     {
         try {
-            $response = $this->client->request('GET', $this->apiUrl, [
-                'query' => [
-                    'lat' => $location->latitude,
-                    'lon' => $location->longitude,
-                    'appid' => $this->apiKey,
-                    'units' => 'metric',
-                    'lang' => 'fr',
-                ],
-            ]);
-
-            return $response->toArray();
+            return $this->weatherProvider->getWeather($location);
         } catch (\Exception $e) {
             return null;
-        } 
+        }
     }
 }
