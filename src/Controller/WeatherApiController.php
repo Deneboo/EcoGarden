@@ -28,16 +28,21 @@ final class WeatherApiController extends AbstractController
         $location = $this->geocodingLocation->getGpsLocation($postCode);
         $weather = $this->weatherService->getWeather($location);
 
-        return $this->json([
-            'city' => $weather->getCity(),
-            'temperature' => $weather->getTemperature(),
-            'feelsLike' => $weather->getFeelsLike(),
-            'tempMin' => $weather->getTempMin(),
-            'tempMax' => $weather->getTempMax(),
-            'windSpeed' => $weather->getWindSpeed(),
-            'description' => $weather->getDescription(),
-            'humidity' => $weather->getHumidity(),
-            'icon' => $weather->getIcon(),
-        ]);
+        return $this->json($weather, JsonResponse::HTTP_OK, [], ['groups' => ['getWeather']]);
+    }
+
+    #[Route('/api/weather/full', name: 'app_weather_full', methods: ['GET'])]
+    public function full(): ?JsonResponse
+    {
+        $user = $this->getUser();
+        $postCode = $user->getPostCode();
+
+        if (empty($postCode)) {
+            return null;
+        }
+        $location = $this->geocodingLocation->getGpsLocation($postCode);
+        $weather = $this->weatherService->getWeather($location);
+
+        return $this->json($weather, JsonResponse::HTTP_OK, [], ['groups' => ['getWeatherFull']]);
     }
 }

@@ -2,16 +2,26 @@
 
 namespace App\DTO;
 
+use Symfony\Component\Serializer\Attribute\Groups;
+
 class Weather
 {
     public function __construct(
+        #[Groups(['getWeather', 'getWeatherFull'])]
         private readonly float $temperature,
+        #[Groups(['getWeather', 'getWeatherFull'])]
         private readonly string $description,
+        #[Groups(['getWeather', 'getWeatherFull'])]
         private readonly int $humidity,
+        #[Groups(['getWeatherFull'])]
         private readonly ?float $feelsLike = null,
+         #[Groups(['getWeatherFull'])]
         private readonly ?float $tempMin = null,
+         #[Groups(['getWeatherFull'])]
         private readonly ?float $tempMax = null,
+         #[Groups(['getWeatherFull'])]
         private readonly ?float $windSpeed = null,
+         #[Groups(['getWeatherFull'])]
         private readonly ?string $city = null,
         private readonly ?string $icon = null
     ) {}
