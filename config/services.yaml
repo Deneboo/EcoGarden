@@ -7,7 +7,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-
+    # open_weather_map_api_url: 'https://api.openweathermap.org/data/2.5/weather'
+    xweather_api_url: 'https://data.api.xweather.com/conditions'
+    geo_api_url: 'https://api.openweathermap.org/geo/1.0/zip'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -21,3 +23,6 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Interface\WeatherProviderInterface:
+        # alias: App\Provider\Weather\OpenWeatherMapProvider
+        alias: App\Provider\Weather\XWeatherProvider
