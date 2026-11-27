@@ -9,7 +9,6 @@ class OpenWeatherMapMapping
     public function map(array $data): Weather
     {
         return new Weather(
-
             apiProvider: 'Ces prévisions vous sont proposées par OpenWeatherMap',
             city: ucfirst($data['name']),
             temperature: $data['main']['temp'],
