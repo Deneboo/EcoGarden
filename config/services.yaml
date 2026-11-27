@@ -9,7 +9,8 @@
 parameters:
     # open_weather_map_api_url: 'https://api.openweathermap.org/data/2.5/weather'
     xweather_api_url: 'https://data.api.xweather.com/conditions'
-    geo_api_url: 'https://api.openweathermap.org/geo/1.0/zip'
+    open_weather_map_geo_api_url: 'https://api.openweathermap.org/geo/1.0/zip'
+    geo_api_gouv_url: 'https://geo.api.gouv.fr/communes'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -26,3 +27,6 @@ services:
     App\Interface\WeatherProviderInterface:
         # alias: App\Provider\Weather\OpenWeatherMapProvider
         alias: App\Provider\Weather\XWeatherProvider
+    App\Interface\LocationProviderInterface:
+        # alias: App\Provider\Location\OpenWeatherMapLocationProvider
+        alias: App\Provider\Location\GeoApiGouvProvider

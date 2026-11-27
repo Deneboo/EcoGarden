@@ -12,7 +12,8 @@ class XWeatherMapping
         $period = $response['periods'][0];
 
         return new Weather(
-            city: $response['place']['name'],
+            apiProvider: 'Ces prévisions vous sont proposées par xWeather',
+            city: ucfirst($response['place']['name']),
             temperature: $period['tempC'],
             feelsLike: $period['feelslikeC'],
             humidity: $period['humidity'],
@@ -20,7 +21,7 @@ class XWeatherMapping
             icon: $period['icon'],
             windSpeed: $period['windSpeedKPH'],
             tempMin: null,
-            tempMax: null,
+            tempMax: null
         );
     }
 }

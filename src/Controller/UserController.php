@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class UserController extends AbstractController
 {
@@ -23,7 +24,7 @@ final class UserController extends AbstractController
     }
 
     #[Route('/api/user/create', name: 'app_user_create', methods: ['POST'])]
-    public function createUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, UrlGeneratorInterface $urlGenerator): JsonResponse
+    public function createUser(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, UserPasswordHasherInterface $passwordHasher, UrlGeneratorInterface $urlGenerator, ValidatorInterface $validator): JsonResponse
     {
        $user = $serializer->deserialize($request->getContent(), User::class, 'json');
        $existingUser = $em->getRepository(User::class)
@@ -40,7 +41,27 @@ final class UserController extends AbstractController
             $user->getPassword()
         );
 
+        $validatedPostCode = $user->getPostCode();
+        $user->setPostCode($validatedPostCode);
         $user->setPassword($hashedPassword);
+
+        $errors = $validator->validate($user);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+
+            foreach ($errors as $error) {
+                $errorMessages[] = [
+                    'field' => $error->getPropertyPath(),
+                    'message' => $error->getMessage(),
+                ];
+            }
+
+            return $this->json(
+                ['errors' => $errorMessages],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
         $em->persist($user);
         $em->flush();
         $jsonUser = $serializer->serialize($user, 'json', ['groups' => 'getUser']);
